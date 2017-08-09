@@ -1,7 +1,7 @@
 # Личный проект «Кекстаграм» [![Build status][travis-image]][travis-url]
 
 * Студент: [Неопознанный енот](https://up.htmlacademy.ru/javascript/10/user/447853).
-* Наставник: `Неизвестно`.
+* Наставник: Магомед Кандаев
 
 ---
 
