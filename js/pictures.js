@@ -18,8 +18,10 @@ function generatePictureArray() {
   var pictures = [];
 
   for (var i = 0; i < NUMBER_OF_PICTURES; i++) {
+    var index = i + 1;
+
     pictures.push({
-      url: 'photos/' + generateRandom(1, 25) + '.jpg',
+      url: 'photos/' + index + '.jpg',
       likes: generateRandom(15, 200),
       comments: COMMENTS[generateRandom(0, COMMENTS.length - 1)],
       commentsNumber: generateRandom(1, 3)
@@ -63,11 +65,9 @@ function appendPhotos() {
 
 function updateGalleryOverlay() {
   var photo = generatePictureArray()[0];
-  var fragment = document.createDocumentFragment();
   var galleryOverlayElement = document.querySelector('.gallery-overlay');
 
-  fragment.appendChild(renderOverlayPhoto(photo));
-  galleryOverlayElement.appendChild(fragment);
+  galleryOverlayElement.appendChild(renderOverlayPhoto(photo));
   galleryOverlayElement.classList.remove('hidden');
 }
 
