@@ -8,10 +8,11 @@ var COMMENTS = [
   'Я поскользнулся на банановой кожуре и уронил фотоаппарат на кота и у меня получилась фотография лучше.',
   'Лица у людей на фотке перекошены, как будто их избивают. Как можно было поймать такой неудачный момент?!'
 ];
+var galleryOverlay = document.querySelector('.gallery-overlay');
 
 appendPhotos();
-updateGalleryOverlay();
 document.querySelector('.upload-overlay').classList.add('hidden');
+initHandlers();
 
 function generatePictureArray() {
   var NUMBER_OF_PICTURES = 25;
@@ -33,22 +34,41 @@ function generatePictureArray() {
 function generateRandom(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
+
 function renderPhoto(picture) {
   var pictureTemplate = document.querySelector('#picture-template').content;
   var pictureElement = pictureTemplate.cloneNode(true);
+  var pictureLink = pictureElement.querySelector('.picture');
+  var commentNumberElem = document.createElement('span');
+  var pictureElementItems = {
+    img: pictureElement.querySelector('img'),
+    comments: pictureElement.querySelector('.picture-comments'),
+    likes: pictureElement.querySelector('.picture-likes')
+  };
 
-  pictureElement.querySelector('img').src = picture.url;
-  pictureElement.querySelector('.picture-comments').textContent = picture.comments;
-  pictureElement.querySelector('.picture-likes').textContent = picture.likes;
+  commentNumberElem.classList.add('picture-comments-num');
+  commentNumberElem.classList.add('hidden');
+  commentNumberElem.textContent = picture.commentsNumber;
+  pictureLink.appendChild(commentNumberElem);
+  pictureElementItems.img.setAttribute('tabindex', 0);
+  pictureElementItems.img.src = picture.url;
+  pictureElementItems.comments.textContent = picture.comments;
+  pictureElementItems.likes.textContent = picture.likes;
+
+  pictureLink.addEventListener('click', function (event) {
+    event.preventDefault();
+    updateGalleryOverlay(event.currentTarget);
+  });
+  pictureLink.addEventListener('keydown', onOverlayEnterPress(event));
   return pictureElement;
 }
 
 function renderOverlayPhoto(picture) {
   var galleryOverlayPreview = document.querySelector('.gallery-overlay-preview');
 
-  galleryOverlayPreview.querySelector('.gallery-overlay-image').src = picture.url;
-  galleryOverlayPreview.querySelector('.comments-count').textContent = picture.commentsNumber;
-  galleryOverlayPreview.querySelector('.likes-count').textContent = picture.likes;
+  galleryOverlayPreview.querySelector('.gallery-overlay-image').src = picture.querySelector('img').src;
+  galleryOverlayPreview.querySelector('.comments-count').textContent = picture.querySelector('.picture-comments-num').textContent;
+  galleryOverlayPreview.querySelector('.likes-count').textContent = picture.querySelector('.picture-likes').textContent;
   return galleryOverlayPreview;
 }
 
@@ -63,12 +83,42 @@ function appendPhotos() {
   picturesElement.appendChild(fragment);
 }
 
-function updateGalleryOverlay() {
-  var photo = generatePictureArray()[0];
-  var galleryOverlayElement = document.querySelector('.gallery-overlay');
-
-  galleryOverlayElement.appendChild(renderOverlayPhoto(photo));
-  galleryOverlayElement.classList.remove('hidden');
+function updateGalleryOverlay(photo) {
+  galleryOverlay.appendChild(renderOverlayPhoto(photo));
+  openOverlay();
 }
 
+function initHandlers() {
+  var closeBtn = document.querySelector('.gallery-overlay-close');
 
+  closeBtn.setAttribute('tabindex', 1);
+  closeBtn.addEventListener('click', function () {
+    closeOverlay();
+  });
+
+  closeBtn.addEventListener('keydown', function (event) {
+    if (event.keyCode === 13) {
+      closeOverlay();
+    }
+  });
+
+  document.addEventListener('keydown', function (event) {
+    if (event.keyCode === 27) {
+      closeOverlay();
+    }
+  });
+}
+
+function onOverlayEnterPress(event) {
+  if (event && event.keyCode === 13) {
+    updateGalleryOverlay(event.currentTarget);
+  }
+}
+
+function openOverlay() {
+  galleryOverlay.classList.remove('hidden');
+}
+
+function closeOverlay() {
+  galleryOverlay.classList.add('hidden');
+}
